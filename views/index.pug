@@ -4,5 +4,8 @@ block content
   h1= title
   p Welcome to #{title}
   if user
+    a(href="/logout") ログアウト
     p #{user.username}
     p #{user._json.avatar_url}
+  else
+    a(href="/login") ログイン

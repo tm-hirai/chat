@@ -69,6 +69,10 @@ app.get('/auth/github/callback',
     res.redirect('/');
   });
 
+app.get('/login', function (req, res) {
+  req.logout();
+  res.redirect('/auth/github');
+});
 app.get('/logout', function (req, res) {
   req.logout();
   res.redirect('/');
