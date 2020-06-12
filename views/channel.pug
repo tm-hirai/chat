@@ -5,3 +5,6 @@ block content
   div
     textarea(cols="30", rows="1")#message-content
     button(data-user-id=user.userId data-channel-id=channel.channelId)#post-message-button 送信
+  if messages
+    each message in messages
+      p #{message.content}
