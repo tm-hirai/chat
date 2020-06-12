@@ -9,7 +9,16 @@ var GitHubStrategy = require('passport-github2').Strategy;
 var session = require('express-session');
 
 var User = require('./models/user');
-User.sync();
+var Channel = require('./models/channel');
+var Message = require('./models/message');
+(async () => {
+  const values = await Promise.all([User.sync(), Channel.sync()]);
+  // MessageはUserとChannelの従属エントリ
+  Message.belongsTo(User, { foreignKey: 'postedBy' });
+  Message.belongsTo(Channel, { foreignKey: 'channelId' });
+  Message.sync();
+})();
+
 
 passport.serializeUser(function (user, done) {
   done(null, user);
