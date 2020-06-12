@@ -2,9 +2,15 @@
 const express = require('express');
 const router = express.Router();
 const uuid = require('uuid');
+// const io = require('./websocket').io;
+// console.log(io);
+// io.on('connect');
+// const io = require('socket.io')(8000);
+
 const Channel = require('../models/channel');
 const Messages = require('../models/message');
 const Message = require('../models/message');
+
 
 /* GET users listing. */
 // チャンネル作成ページ
@@ -49,11 +55,10 @@ router.post('/:channelId/message', function (req, res, next) {
     postedBy: userId,
     channelId: channelId
   }).then(() => {
+    res.io.emit(channelId, { content: content, postedBy: userId });
     res.json({ status: 'OK', content: content });
   });
   // res.render('channel', { title: 'Express', user: req.user });
 });
-
-
 
 module.exports = router;

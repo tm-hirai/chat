@@ -30,3 +30,14 @@ $('#post-message-button').on('click', () => {
       // button.addClass(buttonStyles[data.availability]);
     });
 });
+
+import io from 'socket.io-client';
+function websocket() {
+  const channelId = $('#post-message-button').data('channel-id');
+  const socket = io('//' + document.location.hostname + ':' + document.location.port);
+  socket.on(`${channelId}`, (data) => {
+    console.log('websocket:' + data);
+    console.log(data);
+  });
+}
+websocket();
