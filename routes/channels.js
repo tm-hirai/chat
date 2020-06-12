@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const uuid = require('uuid');
 const Channel = require('../models/channel');
+const Messages = require('../models/message');
 
 /* GET users listing. */
 // チャンネル作成ページ
@@ -11,12 +12,18 @@ router.get('/new', function (req, res, next) {
 });
 // チャンネル表示ページ
 router.get('/:channelId', function (req, res, next) {
-  console.log(req.params.channelId);
-  res.render('channel', { title: 'Express', user: req.user });
+  (async () => {
+    const channelId = req.params.channelId;
+    const channel = await Channel.findByPk(channelId);
+    const messages = await Messages.findAll({
+      where: { channelId: channelId }
+    });
+    res.render('channel', { title: 'Express', user: req.user, channel: channel, messages: messages });
+  })().catch(next);
+
 });
 // チャンネル作成、削除
 router.post('/', function (req, res, next) {
-
   const channelName = req.body.channelName;
   const channelId = uuid.v4();
 
