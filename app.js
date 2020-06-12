@@ -41,7 +41,11 @@ passport.use(new GitHubStrategy({
         username: profile.username,
         avatarUrl: profile._json.avatar_url ? profile._json.avatar_url : ''
       }).then(() => {
-        done(null, profile);
+        done(null, {
+          userId: profile.id,
+          username: profile.username,
+          avatarUrl: profile._json.avatar_url ? profile._json.avatar_url : ''
+        });
       });
     });
   }
