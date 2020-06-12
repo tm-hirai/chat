@@ -4,6 +4,7 @@ const router = express.Router();
 const uuid = require('uuid');
 const Channel = require('../models/channel');
 const Messages = require('../models/message');
+const Message = require('../models/message');
 
 /* GET users listing. */
 // チャンネル作成ページ
@@ -36,8 +37,21 @@ router.post('/', function (req, res, next) {
 });
 // メッセージ作成、削除
 router.post('/:channelId/message', function (req, res, next) {
-  console.log('message' + req.params.channelId);
-  res.render('channel', { title: 'Express', user: req.user });
+  console.log(req.params.channelId);
+  console.log(req.body);
+
+  const channelId = req.params.channelId;
+  const content = req.body.content;
+  const userId = req.body.userId;
+
+  Message.create({
+    content: content,
+    postedBy: userId,
+    channelId: channelId
+  }).then(() => {
+    res.json({ status: 'OK', content: content });
+  });
+  // res.render('channel', { title: 'Express', user: req.user });
 });
 
 
