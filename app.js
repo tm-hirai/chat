@@ -40,6 +40,7 @@ passport.use(new GitHubStrategy({
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var channelsRouter = require('./routes/channels');
 
 var app = express();
 app.use(helmet());
@@ -58,6 +59,7 @@ app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/channels', channelsRouter);
 
 app.get('/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }));
