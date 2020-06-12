@@ -4,8 +4,14 @@ block content
   h1= title
   p Welcome to #{title}
   if user
-    a(href="/logout") ログアウト
-    p #{user.username}
-    p #{user._json.avatar_url}
+    div
+      a(href="/logout") ログアウト
+      p #{user.username}
+      p #{user._json.avatar_url}
+    div
+      each channel in channels
+        a(href=`/channels/${channel.channelId}`) #{channel.channelName}
   else
     a(href="/login") ログイン
+  
+
