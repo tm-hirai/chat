@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon -L ./bin/www"
+    "start": "nodemon -L ./bin/www",
+    "test": "node_modules/mocha/bin/mocha --timeout 10000 --exit"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
@@ -26,6 +27,7 @@
     "@babel/core": "^7.10.2",
     "@babel/preset-env": "^7.10.2",
     "babel-loader": "^8.1.0",
+    "mocha": "^8.0.1",
     "nodemon": "^2.0.4",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
