@@ -3,7 +3,7 @@ import $ from 'jquery';
 const global = Function('return this;')();
 global.jQuery = $;
 import io from 'socket.io-client';
-// import bootstrap from 'bootstrap';
+import bootstrap from 'bootstrap';
 
 $('#post-message-button').on('click', () => {
   const button = $('#post-message-button')
@@ -41,6 +41,8 @@ function websocket() {
     socket.on(`${channelId}`, (data) => {
       console.log('websocket:' + data);
       console.log(data);
+      let text = "<p>" + data.content + "</p>";
+      $('#message-area').append(text);
     });
   }
 }

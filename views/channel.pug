@@ -1,10 +1,15 @@
 extends layout
 
 block content
-  h1 #{channel.channelName}
-  div
-    textarea(cols="30", rows="1")#message-content
-    button(data-user-id=user.userId data-channel-id=channel.channelId)#post-message-button 送信
-  if messages
-    each message in messages
-      p #{message.content}
+  div.my-3
+    h3.border-bottom #{channel.channelName}
+    div.h-100#message-area
+      if messages
+        each message in messages
+          p #{message.content}
+
+    //- div.fixed-bottom.container
+    form
+    div.input-group.my-3
+      textarea(rows="1").form-control.mr-2#message-content
+      button(data-user-id=user.userId data-channel-id=channel.channelId).btn.btn-primary#post-message-button 送信
