@@ -1,85 +1,120 @@
-// 'use strict';
-// const request = require('supertest');
-// const assert = require('assert');
-// const app = require('../app');
-// const passportStub = require('passport-stub');
-// const User = require('../models/user');
+'use strict';
+const request = require('supertest');
+const assert = require('assert');
+const app = require('../app').app;
+const passportStub = require('passport-stub');
+const User = require('../models/user');
+const Channel = require('../models/channel');
+const Message = require('../models/message');
+const { promises } = require('fs');
 // const Schedule = require('../models/schedule');
 // const Candidate = require('../models/candidate');
 // const Availability = require('../models/availability');
 // const Comment = require('../models/comment');
 // const deleteScheduleAggregate = require('../routes/schedules').deleteScheduleAggregate;
 
-// describe('/login', () => {
-//   before(() => {
-//     passportStub.install(app);
-//     passportStub.login({ username: 'testuser' });
-//   });
+describe('/login', () => {
+  before(() => {
+    passportStub.install(app);
+    passportStub.login({ username: 'testuser' });
+  });
 
-//   after(() => {
-//     passportStub.logout();
-//     passportStub.uninstall(app);
-//   });
+  after(() => {
+    passportStub.logout();
+    passportStub.uninstall(app);
+  });
 
-//   it('ログインのためのリンクが含まれる', (done) => {
-//     request(app)
-//       .get('/login')
-//       .expect('Content-Type', 'text/html; charset=utf-8')
-//       .expect(/<a class="btn btn-info my-3" href="\/auth\/github"/)
-//       .expect(200, done);
-//   });
+  it('ログインのためのリンクが含まれる', (done) => {
+    request(app)
+      .get('/login')
+      .expect('Content-Type', 'text/html; charset=utf-8')
+      .expect(/<a.*href="\/auth\/github"/)
+      .expect(200, done);
+  });
+});
 
-//   it('ログイン時はユーザー名が表示される', (done) => {
-//     request(app)
-//       .get('/login')
-//       .expect(/testuser/)
-//       .expect(200, done);
-//   });
-// });
+describe('/', () => {
+  before(() => {
+    passportStub.install(app);
+    passportStub.login({ username: 'testuser' });
+  });
 
-// describe('/logout', () => {
-//   it('/ にリダイレクトされる', (done) => {
-//     request(app)
-//       .get('/logout')
-//       .expect('Location', '/')
-//       .expect(302, done);
-//   });
-// });
+  after(() => {
+    passportStub.logout();
+    passportStub.uninstall(app);
+  });
+  it('ログイン時はユーザー名が表示される', (done) => {
+    request(app)
+      .get('/')
+      .expect(/testuser/)
+      .expect(200, done);
+  });
+});
 
-// describe('/schedules', () => {
-//   before(() => {
-//     passportStub.install(app);
-//     passportStub.login({ id: 0, username: 'testuser' });
-//   });
+describe('/logout', () => {
+  it('/ にリダイレクトされる', (done) => {
+    request(app)
+      .get('/logout')
+      .expect('Location', '/')
+      .expect(302, done);
+  });
+});
 
-//   after(() => {
-//     passportStub.logout();
-//     passportStub.uninstall(app);
-//   });
 
-//   it('予定が作成でき、表示される', (done) => {
-//     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
-//       request(app)
-//         .post('/schedules')
-//         .send({ scheduleName: 'テスト予定1', memo: 'テストメモ1\r\nテストメモ2', candidates: 'テスト候補1\r\nテスト候補2\r\nテスト候補3' })
-//         .expect('Location', /schedules/)
-//         .expect(302)
-//         .end((err, res) => {
-//           const createdSchedulePath = res.headers.location;
-//           request(app)
-//             .get(createdSchedulePath)
-//             .expect(/テスト予定1/)
-//             .expect(/テストメモ1/)
-//             .expect(/テストメモ2/)
-//             .expect(/テスト候補1/)
-//             .expect(/テスト候補2/)
-//             .expect(/テスト候補3/)
-//             .expect(200)
-//             .end((err, res) => { deleteScheduleAggregate(createdSchedulePath.split('/schedules/')[1], done, err); });
-//         });
-//     });
-//   });
-// });
+describe('/channels', () => {
+  const userProfile = { userId: 0, username: 'testuser', avatarUrl: 'http://example.com' };
+
+  before(() => {
+    passportStub.install(app);
+    passportStub.login(userProfile);
+  });
+
+  after(() => {
+    passportStub.logout();
+    passportStub.uninstall(app);
+  });
+
+  it('チャンネルを作成でき、表示される', (done) => {
+    (async () => {
+      // チャンネルを作成
+      await User.upsert(userProfile);
+      let result = await request(app)
+        .post('/channels')
+        .send({ channelName: 'テストチャンネル' })
+        .expect('Location', /channels/)
+        .expect(302);
+
+      // チャンネルの削除
+      const createdChannelPath = result.res.headers.location;
+      console.log(createdChannelPath);
+      result = await request(app)
+        .get(createdChannelPath)
+        .expect(/テストチャンネル/)
+        .expect(200)
+
+      deleteChannel(createdChannelPath.split('/channels/')[1], done);
+    })();
+  });
+});
+
+// チャンネルの削除関数
+function deleteChannel(channelId, done) {
+  (async () => {
+    const cd = Channel.destroy({
+      where: { channelId: channelId }
+    });
+    const md = Message.destroy({
+      where: { channelId: channelId }
+    });
+    const res = await Promise.all([cd, md]);
+    console.log(res);
+    done();
+  })().catch(e => {
+    console.log(e);
+    done(e)
+  });
+}
+
 
 // describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
 //   before(() => {

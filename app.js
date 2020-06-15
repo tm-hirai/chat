@@ -54,6 +54,7 @@ passport.use(new GitHubStrategy({
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var channelsRouter = require('./routes/channels');
+var loginRouter = require('./routes/login');
 
 var app = express();
 var server = require('http').Server(app);
@@ -80,6 +81,7 @@ app.use(passport.session());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/channels', channelsRouter);
+app.use('/login', loginRouter);
 
 app.get('/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }));
@@ -91,10 +93,6 @@ app.get('/auth/github/callback',
     res.redirect('/');
   });
 
-app.get('/login', function (req, res) {
-  req.logout();
-  res.redirect('/auth/github');
-});
 app.get('/logout', function (req, res) {
   req.logout();
   res.redirect('/');

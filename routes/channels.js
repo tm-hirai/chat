@@ -38,7 +38,7 @@ router.post('/', function (req, res, next) {
     channelId: channelId,
     channelName: channelName
   }).then(() => {
-    res.redirect('/');
+    res.redirect(`/channels/${channelId}`);
   });
 });
 // メッセージ作成、削除
