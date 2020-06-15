@@ -2,6 +2,7 @@
 import $ from 'jquery';
 const global = Function('return this;')();
 global.jQuery = $;
+import io from 'socket.io-client';
 // import bootstrap from 'bootstrap';
 
 $('#post-message-button').on('click', () => {
@@ -31,13 +32,17 @@ $('#post-message-button').on('click', () => {
     });
 });
 
-import io from 'socket.io-client';
+// チャットページで使用
 function websocket() {
-  const channelId = $('#post-message-button').data('channel-id');
-  const socket = io('//' + document.location.hostname + ':' + document.location.port);
-  socket.on(`${channelId}`, (data) => {
-    console.log('websocket:' + data);
-    console.log(data);
-  });
+  let reg = /channels\/.+-/;
+  if (location.href.match(reg)) {
+    const channelId = $('#post-message-button').data('channel-id');
+    const socket = io('//' + document.location.hostname + ':' + document.location.port);
+    socket.on(`${channelId}`, (data) => {
+      console.log('websocket:' + data);
+      console.log(data);
+    });
+  }
 }
 websocket();
+

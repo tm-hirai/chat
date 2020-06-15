@@ -98,7 +98,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var global = Function('return this;')();
-global.jQuery = jquery__WEBPACK_IMPORTED_MODULE_0___default.a; // import bootstrap from 'bootstrap';
+global.jQuery = jquery__WEBPACK_IMPORTED_MODULE_0___default.a;
+ // import bootstrap from 'bootstrap';
 
 jquery__WEBPACK_IMPORTED_MODULE_0___default()('#post-message-button').on('click', function () {
   var button = jquery__WEBPACK_IMPORTED_MODULE_0___default()('#post-message-button');
@@ -122,16 +123,19 @@ jquery__WEBPACK_IMPORTED_MODULE_0___default()('#post-message-button').on('click'
     // button.removeClass('btn-danger btn-secondary btn-success');
     // button.addClass(buttonStyles[data.availability]);
   });
-});
-
+}); // チャットページで使用
 
 function websocket() {
-  var channelId = jquery__WEBPACK_IMPORTED_MODULE_0___default()('#post-message-button').data('channel-id');
-  var socket = socket_io_client__WEBPACK_IMPORTED_MODULE_1___default()('//' + document.location.hostname + ':' + document.location.port);
-  socket.on("".concat(channelId), function (data) {
-    console.log('websocket:' + data);
-    console.log(data);
-  });
+  var reg = /channels\/.+-/;
+
+  if (location.href.match(reg)) {
+    var channelId = jquery__WEBPACK_IMPORTED_MODULE_0___default()('#post-message-button').data('channel-id');
+    var socket = socket_io_client__WEBPACK_IMPORTED_MODULE_1___default()('//' + document.location.hostname + ':' + document.location.port);
+    socket.on("".concat(channelId), function (data) {
+      console.log('websocket:' + data);
+      console.log(data);
+    });
+  }
 }
 
 websocket();
