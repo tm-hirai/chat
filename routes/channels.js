@@ -2,11 +2,9 @@
 const express = require('express');
 const router = express.Router();
 const uuid = require('uuid');
-// const io = require('./websocket').io;
-// console.log(io);
-// io.on('connect');
-// const io = require('socket.io')(8000);
+const moment = require('moment-timezone');
 
+const User = require('../models/user');
 const Channel = require('../models/channel');
 const Messages = require('../models/message');
 const Message = require('../models/message');
@@ -23,8 +21,13 @@ router.get('/:channelId', function (req, res, next) {
     const channelId = req.params.channelId;
     const channel = await Channel.findByPk(channelId);
     const messages = await Messages.findAll({
-      where: { channelId: channelId }
+      where: { channelId: channelId },
+      includes: [{
+        model: User,
+        required: true
+      }]
     });
+    console.log(messages);
     res.render('channel', { title: 'Express', user: req.user, channel: channel, messages: messages });
   })().catch(next);
 
@@ -54,8 +57,9 @@ router.post('/:channelId/message', function (req, res, next) {
     content: content,
     postedBy: userId,
     channelId: channelId
-  }).then(() => {
-    res.io.emit(channelId, { content: content, postedBy: userId });
+  }).then((message) => {
+    const formatedCreatedAt = moment(message.createdAt).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm');
+    res.io.emit(channelId, { content: content, user: req.user, createdAt: formatedCreatedAt });
     res.json({ status: 'OK', content: content });
   });
   // res.render('channel', { title: 'Express', user: req.user });
