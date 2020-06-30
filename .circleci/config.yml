@@ -9,8 +9,8 @@ jobs:
       - checkout
       - node/with-cache:
           steps:
-            - run: npm install
-            - run: npm test
+            - run: yarn install
+            - run: docker-compose run --rm web yarn test
 workflows:
     build-and-test:
       jobs:
