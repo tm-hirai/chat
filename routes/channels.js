@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const uuid = require('uuid');
 const moment = require('moment-timezone');
+const authenticationEnsurer = require('./authentication-ensurer');
 
 const User = require('../models/user');
 const Channel = require('../models/channel');
@@ -12,7 +13,7 @@ const Message = require('../models/message');
 
 /* GET users listing. */
 // チャンネル作成ページ
-router.get('/new', function (req, res, next) {
+router.get('/new', authenticationEnsurer, function (req, res, next) {
   res.render('new', { title: 'Express', user: req.user });
 });
 // チャンネル表示ページ
@@ -33,7 +34,7 @@ router.get('/:channelId', function (req, res, next) {
 
 });
 // チャンネル作成、削除
-router.post('/', function (req, res, next) {
+router.post('/', authenticationEnsurer, function (req, res, next) {
   const channelName = req.body.channelName;
   const channelId = uuid.v4();
 
@@ -45,7 +46,7 @@ router.post('/', function (req, res, next) {
   });
 });
 // メッセージ作成、削除
-router.post('/:channelId/message', function (req, res, next) {
+router.post('/:channelId/message', authenticationEnsurer, function (req, res, next) {
   console.log(req.params.channelId);
   console.log(req.body);
 
