@@ -9,7 +9,16 @@ var GitHubStrategy = require('passport-github2').Strategy;
 var session = require('express-session');
 
 var User = require('./models/user');
-User.sync();
+var Channel = require('./models/channel');
+var Message = require('./models/message');
+(async () => {
+  const values = await Promise.all([User.sync(), Channel.sync()]);
+  // MessageはUserとChannelの従属エントリ
+  Message.belongsTo(User, { foreignKey: 'postedBy' });
+  Message.belongsTo(Channel, { foreignKey: 'channelId' });
+  Message.sync();
+})();
+
 
 passport.serializeUser(function (user, done) {
   done(null, user);
@@ -32,7 +41,11 @@ passport.use(new GitHubStrategy({
         username: profile.username,
         avatarUrl: profile._json.avatar_url ? profile._json.avatar_url : ''
       }).then(() => {
-        done(null, profile);
+        done(null, {
+          userId: profile.id,
+          username: profile.username,
+          avatarUrl: profile._json.avatar_url ? profile._json.avatar_url : ''
+        });
       });
     });
   }
@@ -40,13 +53,22 @@ passport.use(new GitHubStrategy({
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var channelsRouter = require('./routes/channels');
+var loginRouter = require('./routes/login');
 
 var app = express();
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
+
 app.use(helmet());
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+app.use(function (req, res, next) {
+  res.io = io;
+  next();
+});
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -58,6 +80,8 @@ app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/channels', channelsRouter);
+app.use('/login', loginRouter);
 
 app.get('/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }));
@@ -69,10 +93,6 @@ app.get('/auth/github/callback',
     res.redirect('/');
   });
 
-app.get('/login', function (req, res) {
-  req.logout();
-  res.redirect('/auth/github');
-});
 app.get('/logout', function (req, res) {
   req.logout();
   res.redirect('/');
@@ -94,4 +114,12 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+io.on('connection', (socket) => {
+  console.log('connect');
+}
+);
+
+module.exports = {
+  app: app,
+  server: server
+};

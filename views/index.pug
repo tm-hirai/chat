@@ -1,11 +1,18 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
   if user
-    a(href="/logout") ログアウト
-    p #{user.username}
-    p #{user._json.avatar_url}
+    //- div
+    //-   a(href="/logout") ログアウト
+    //-   p #{user.username}
+    //-   p #{user.avatarUrl}
+    div.my-3.p-3
+      a(href="/channels/new").btn.btn-primary チャンネル作成
+      h6.border-bottom.pb-2 チャンネル一覧
+      each channel in channels
+        div.media.text-muted.pt-3
+          a(href=`/channels/${channel.channelId}`) #{channel.channelName}
   else
     a(href="/login") ログイン
+  
+

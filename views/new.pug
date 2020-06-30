@@ -1,0 +1,7 @@
+extends layout
+
+block content
+  h1 チャンネル作成
+  form(method="post" action="/channels")
+    input(type="text", name="channelName")
+    button(type="submit") 作成
