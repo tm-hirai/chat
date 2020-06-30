@@ -6,12 +6,22 @@ const passportStub = require('passport-stub');
 const User = require('../models/user');
 const Channel = require('../models/channel');
 const Message = require('../models/message');
-const { promises } = require('fs');
+// const { promises } = require('fs');
 // const Schedule = require('../models/schedule');
 // const Candidate = require('../models/candidate');
 // const Availability = require('../models/availability');
 // const Comment = require('../models/comment');
 // const deleteScheduleAggregate = require('../routes/schedules').deleteScheduleAggregate;
+
+describe('/', () => {
+  it('ログインページへのリンクが含まれる', (done) => {
+    request(app)
+      .get('/')
+      .expect('Content-Type', 'text/html; charset=utf-8')
+      .expect(/<a.*href="\/login"/)
+      .expect(200, done);
+  });
+});
 
 describe('/login', () => {
   before(() => {
@@ -47,6 +57,13 @@ describe('/', () => {
     request(app)
       .get('/')
       .expect(/testuser/)
+      .expect(200, done);
+  });
+  it('チャンネル作成画面へのリンクが含まれる', (done) => {
+    request(app)
+      .get('/')
+      .expect('Content-Type', 'text/html; charset=utf-8')
+      .expect(/<a.*href="\/channels\/new"/)
       .expect(200, done);
   });
 });
