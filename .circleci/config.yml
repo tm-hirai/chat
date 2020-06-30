@@ -25,12 +25,21 @@ jobs:
       - run: node -v
       - run: yarn --varsion
       - run: yarn install
+      - run:
+          name: dockerize をインストール
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.3.0
+      - run:
+          name: db を待機
+          command: dockerize -wait tcp://db:5432 -timeout 1m
       - run: yarn test
-
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+
+
 # version: 2.1
 # orbs:
 #   node: circleci/node@1.1.6
